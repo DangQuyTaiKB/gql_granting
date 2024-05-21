@@ -2,7 +2,7 @@ import strawberry
 import dataclasses
 import datetime
 
-from typing import List, Optional
+from typing import List, Optional, Annotated
 from ._GraphResolvers import IDType
 from uoishelpers.resolvers import createInputs
 
@@ -13,12 +13,37 @@ async def resolve_reference(cls, info: strawberry.types.Info, id: IDType):
 from ._GraphResolvers import (
     getLoadersFromInfo, 
     )
+from ._GraphPermissions import (
+    OnlyForAuthentized
+)
 
+AcProgramStudentGQLModel = Annotated["AcProgramStudentGQLModel", strawberry.lazy(".GraphTypeDefinitions")]
+AcClassificationGQLModel = Annotated["AcClassificationGQLModel", strawberry.lazy(".GraphTypeDefinitions")]
 
 @strawberry.federation.type(extend=True, keys=["id"])
 class UserGQLModel:
     id: IDType = strawberry.federation.field(external=True)
     resolve_reference = resolve_reference
+
+    @strawberry.field(
+            description="""Program owing this subjects""",
+            permission_classes=[OnlyForAuthentized(isList=True)]
+            )
+    async def studies(self, info: strawberry.types.Info) -> List["AcProgramStudentGQLModel"]:
+        from .GraphTypeDefinitions import AcProgramStudentGQLModel
+        loader = AcProgramStudentGQLModel.getLoader(info)
+        result = await loader.filter_by(student_id=self.id)
+        return result    
+    
+    @strawberry.field(
+            description="""user classifications""",
+            permission_classes=[OnlyForAuthentized(isList=True)]
+            )
+    async def classifications(self, info: strawberry.types.Info) -> List["AcClassificationGQLModel"]:
+        from .GraphTypeDefinitions import AcClassificationGQLModel
+        loader = AcClassificationGQLModel.getLoader(info)
+        result = await loader.filter_by(student_id=self.id)
+        return result
 
 
 @strawberry.federation.type(extend=True, keys=["id"])

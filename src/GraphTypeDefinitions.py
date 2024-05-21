@@ -1025,7 +1025,7 @@ async def lesson_by_id(self, info: strawberry.types.Info, id: IDType) -> Optiona
 @asPage
 async def classification_page(self, info: strawberry.types.Info, 
                        skip: Optional[int] = 0, limit: Optional[int] = 10, 
-                       where: Optional[TopicInputFilter] = None) -> List["AcClassificationGQLModel"]:
+                       where: Optional[ClassificationInputFilter] = None) -> List["AcClassificationGQLModel"]:
     return AcClassificationGQLModel.getLoader(info)
 
 @strawberry.field(
@@ -1104,7 +1104,7 @@ class LessonTypeInputFilter:
 @asPage
 async def lesson_type_page(self, info: strawberry.types.Info, 
                        skip: Optional[int] = 0, limit: Optional[int] = 10, 
-                       where: Optional[TopicInputFilter] = None) -> List["AcLessonTypeGQLModel"]:
+                       where: Optional[LessonTypeInputFilter] = None) -> List["AcLessonTypeGQLModel"]:
     return AcLessonTypeGQLModel.getLoader(info)
 
 @strawberry.field(
